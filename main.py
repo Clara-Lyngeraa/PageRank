@@ -3,9 +3,9 @@ import networkx as nx
 import numpy as np
 
 #Vector x_k: entries corresponding to the pagerank score for each node in the graph at iteration k
-def page_rank(G):
+def page_rank(G: nx.DiGraph):
     n = G.number_of_nodes()
-    rev_G = G.reverse()
+    rev_G: nx.DiGraph = G.reverse()
     branching = [G.out_degree(i) for i in G.nodes] #Outgoing edges from node i
     dangling_nodes = [node for node in G.nodes if G.out_degree(node) == 0] #List of nodes with no outgoing edges
     x_0 = [1/n for i in range(n)] #Initial probability distribution // initial guess for ?? Take and multiplyby n
@@ -31,15 +31,10 @@ def page_rank(G):
         dangling_sum = sum(x_k[j] / n for j in dangling_nodes) #sum of the pagerank score for each of the dangling nodes divided by the total number of nodes
         for i in range(n): #loop over all nodes
             # Initialize an array to hold the contribution from A
-            A_x_k = np.zeros(n)
-            #loop over reversedgraph:
-            backlinks_to_node_i = list(rev_G.predecessors(i))
-            for link in backlinks_to_node_i:
-                out_degree_link = G.outdegree(link)
-                if out_degree_link > 0:  # Avoid division by zero
-                    A_x_k[i] += x_k[link] / out_degree_link
-
-            x_k_one = (1-m)*A_x_k+(1-m)*dangling_sum+m*Sx_k
+            #get links to i
+            links_to_i = rev_G.successors(i) #using links to i, since A is sparse aka all other entries of A is 0. So matrix multiplication is too performance expensive
+            ak_sum = sum(1/n * x_k[j] for j in links_to_i)
+            x_k_one = (1-m)*ak_sum+(1-m)*dangling_sum+m*Sx_k
             x_k = x_k_one
 
 def random_surfer(graph):
@@ -51,8 +46,6 @@ def main():
     fh=open(sys.argv[1],'rb')
     G: nx.DiGraph=nx.read_adjlist(fh,create_using=nx.DiGraph()) #G the graph
     fh.close()
-
-    setup(G)
 
 
 if __name__ == "__main__":
