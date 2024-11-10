@@ -41,7 +41,7 @@ def page_rank(G: nx.DiGraph):
     # print(m)
 
      #outer loop. Multiply current vector by M until eigenvector is reached
-    for _ in range(50):
+    for k in range(50):
 
         #sum of the pagerank score for each of the dangling nodes divided by the total number of nodes
         dangling_sum = sum(x_k[j] / n for j in dangling_nodes) #maybe: dangling_sum = sum(x_k[j] for j in dangling_nodes) / n
@@ -61,10 +61,16 @@ def page_rank(G: nx.DiGraph):
             #update i'th entry in pagerank vector 
             x_k_1[i] = (1 - m) * (link_sum + dangling_sum) + m * (1 / n) #1/n from S matrix
 
+        # Check for convergence
+        if np.linalg.norm(x_k_1 - x_k, 1) < 0.0001:
+            print("Converged at iteration:", k)
+            break
+        
+
         #update pagerank to new pagerank vector
         x_k = x_k_1
        
-    print("pagerank calculated to be:")
+    print("Pagerank calculated to be:")
     print(x_k)
 
 
