@@ -41,7 +41,6 @@ def page_rank(G: nx.DiGraph):
             # #So matrix multiplication is too performance expensive
             links_to_node_i = list(rev_G.successors(str(i))) 
 
-            #what is happening here?
             link_sum = sum(x_k[int(j)] / branching[int(j)] for j in links_to_node_i if branching[int(j)] > 0)
 
             #update i'th entry in pagerank vector 
